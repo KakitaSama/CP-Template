@@ -1,0 +1,106 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+struct PersistentKthSegTree {
+    struct Node {
+        int left, right;
+        int cnt;
+        Node(int l = 0, int r = 0, int c = 0) : left(l), right(r), cnt(c) {}
+    };
+
+    int n;
+    vector<Node> tree;
+    vector<int> root;
+
+    void init(int n_) {
+        n = n_;
+        tree.clear();
+        tree.reserve(40 * n);
+        tree.push_back(Node()); // dummy node 0
+        root.assign(1, 0);      // root[0] = empty
+    }
+
+    int newNode() {
+        tree.push_back(Node());
+        return (int)tree.size() - 1;
+    }
+
+    int update(int prevRoot, int L, int R, int pos, int delta) {
+        int cur = newNode();
+        tree[cur] = tree[prevRoot];
+        tree[cur].cnt += delta;
+        if (L == R) return cur;
+        int mid = (L + R) >> 1;
+        if (pos <= mid) {
+            tree[cur].left = update(tree[prevRoot].left, L, mid, pos, delta);
+        } else {
+            tree[cur].right = update(tree[prevRoot].right, mid + 1, R, pos, delta);
+        }
+        return cur;
+    }
+
+    void add_version(int pos) {
+        int prevRoot = root.back();
+        int newRoot = update(prevRoot, 1, n, pos, 1);
+        root.push_back(newRoot);
+    }
+
+    int kth(int rootL, int rootR, int L, int R, int k) {
+        if (L == R) return L;
+        int leftL = tree[rootL].left;
+        int leftR = tree[rootR].left;
+        int cntLeft = tree[leftR].cnt - tree[leftL].cnt;
+        int mid = (L + R) >> 1;
+        if (k <= cntLeft) {
+            return kth(leftL, leftR, L, mid, k);
+        } else {
+            int rightL = tree[rootL].right;
+            int rightR = tree[rootR].right;
+            return kth(rightL, rightR, mid + 1, R, k - cntLeft);
+        }
+    }
+
+    int kth_in_range(int l, int r, int k) {
+        return kth(root[l-1], root[r], 1, n, k);
+    }
+};
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m;
+    if (!(cin >> n >> m)) return 0;
+
+    vector<int> a(n + 1);
+    for (int i = 1; i <= n; ++i) cin >> a[i];
+
+    // coordinate compress
+    vector<int> comp(a.begin() + 1, a.end());
+    sort(comp.begin(), comp.end());
+    comp.erase(unique(comp.begin(), comp.end()), comp.end());
+    int C = (int)comp.size();
+
+    auto get_id = [&](int x) {
+        return (int)(lower_bound(comp.begin(), comp.end(), x) - comp.begin()) + 1; // 1-based
+    };
+
+    PersistentKthSegTree pst;
+    pst.init(C);
+
+    // build persistent versions for prefixes
+    for (int i = 1; i <= n; ++i) {
+        int id = get_id(a[i]);
+        pst.add_version(id);
+    }
+
+    while (m--) {
+        int L, R, K;
+        cin >> L >> R >> K;
+        int compressed_id = pst.kth_in_range(L, R, K);
+        int answer = comp[compressed_id - 1]; // map back from 1-based id to value
+        cout << answer << "\n";
+    }
+
+    return 0;
+}
