@@ -1,3 +1,4 @@
+#include <bits/stdc++.h>
 // Wavelet Tree (static). Values are ints. Positions: 1..n inside WT (wrap for 0-index arrays).
 struct Wavelet {
     int lo, hi; Wavelet *L=nullptr, *R=nullptr;
