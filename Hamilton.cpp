@@ -1,3 +1,4 @@
+#include <bits/stdc++.h>
 // ==================== EULER & HAMILTON PACK ====================
 namespace Euler {
     enum Type { NONE=0, PATH=1, CIRCUIT=2 };
