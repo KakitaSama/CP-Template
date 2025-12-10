@@ -1,3 +1,4 @@
+#include <bits/stdc++.h>
 /***************** NUMBER THEORY MEGA TEMPLATE *****************/
 #include <bits/stdc++.h>
 using namespace std;
