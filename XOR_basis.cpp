@@ -1,4 +1,5 @@
-	#define i23 long long
+#include <bits/stdc++.h>
+#define i23 long long
 
 vector<i23> basis;
 
