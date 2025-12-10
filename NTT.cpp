@@ -1,3 +1,4 @@
+#include <bits/stdc++.h>
 // ---------- Fast & safe NTT (mod 998244353, G = 3) ----------
 const int MOD = 998244353;
 const int G   = 3;
